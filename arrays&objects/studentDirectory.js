@@ -1,3 +1,6 @@
+//Information for each student is stored in an object
+// From those objects, functions pull information about age,email addresses and programming languages.
+// stores them in arrays and outputs them  
 'use strict'
 
 
