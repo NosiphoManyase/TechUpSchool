@@ -103,7 +103,7 @@ function getAllStudents() {
         console.log('Ok!');
     } else {
         console.log('Your input is wrong, enter y/n');
-        addStudentToGrade(); 
+        getAllStudents();
     }
 
     return studentGrade;
