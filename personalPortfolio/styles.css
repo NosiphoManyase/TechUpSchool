@@ -1,0 +1,46 @@
+body {
+ margin:0cm;
+ margin-top: 0cm;
+ background-image:url("background.png");
+ background-repeat: no-repeat;
+ background-size: cover;
+}
+
+.first-section{
+ margin-top: 0%;
+ background-image:url("shore_view.jpg");
+ background-repeat: no-repeat;
+ background-size: cover;  
+}
+.second-section{
+    margin-left: 15px;
+}
+
+img {
+ max-width: 200px;
+ border-radius: 50%;
+
+}
+.my-name{
+  font-family:'Copperplate Gothic Light', 'Arial Narrow', Arial, sans-serif;
+  color: rgb(51, 75, 143);
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.my-title{
+    font-family: fantasy;
+    font-size: large;
+}
+
+.intro {
+ margin: 10px;
+ font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ font-variant: small-caps;
+}
+
+h3 span{
+ background-color: rgb(148, 213, 224);
+}
+
