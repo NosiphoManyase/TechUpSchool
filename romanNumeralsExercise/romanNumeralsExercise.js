@@ -1,38 +1,42 @@
-const inputNumber = prompt("Enter any digit between one and 3000: ");
+const inputNumber = prompt("Enter any digit between 1 and 3000: ");
 
 const seperateInputNumbers = [];
 
 let zeros;
 
+function eachValue(){
+    for (let i = 0; i<inputNumber.length; i++) {
+        const numberA = inputNumber[i] + zeros ;
+        zeros = zeros.slice(0,-1);
+        console.log(numberA);
+        seperateInputNumbers.push(Number(numberA));
+        }
+        return;
+}
 // loop through each value in input, round off each value to nearest 1000,100 or 10
 function numberRoundOff() {   
-    if (inputNumber.length == 4) {
+    if (inputNumber.length == 4 && inputNumber <= 3000) {
         zeros = '000';
-        for (let i = 0; i<inputNumber.length; i++) {
-        const numberA = inputNumber[i] + zeros ;
-        zeros = zeros.slice(0,-1);
-        seperateInputNumbers.push(Number(numberA));
-        }
+        eachValue();
+        
+    } else if (inputNumber.length == 4 && inputNumber > 3000){
+        console.log('Incorrect input! The number you have inserted is larger than 3000');
+
     } else if (inputNumber.length == 3) {
         zeros = '00';
-        for (let i = 0; i<inputNumber.length; i++) {
-        const numberA = inputNumber[i] + zeros ;
-        zeros = zeros.slice(0,-1);
-        seperateInputNumbers.push(Number(numberA));
-        }
+        eachValue();
+
     } else if (inputNumber.length == 2) {
         zeros = '0';
-        for (let i = 0; i<inputNumber.length; i++) {
-        const numberA = inputNumber[i] + zeros ;
-        zeros = zeros.slice(0,-1);
-        seperateInputNumbers.push(Number(numberA));
-        }
+        eachValue();
+
     } else if (inputNumber.length == 1) {
         seperateInputNumbers.push(Number(inputNumber));
+
     } else if ( inputNumber.length > 4) {
         console.log("The number you have inserted is too large")
-    }
-    else {
+
+    } else {
         console.log('You have not inserted a number');
     }
     return seperateInputNumbers;
@@ -42,102 +46,83 @@ console.log('Input numbers seperated and rounded off: ')
 console.log(seperateInputNumbers);
 
 
-let romanNumeralValue = '';
+let romanNumeralValue = [];
 let testValue;
-let baseNum;
 
-function romanNumerals() {
-    for (let i=0; i<seperateInputNumbers.length; i++){
-        if (3000 < Number(inputNumber)){
-            romanNumeralValue = '';
-            console.log('Incorrect input! The number you have inserted is larger than 3000');
-            break;
-        } else if(900<seperateInputNumbers[i] && seperateInputNumbers[i]<3000) {
-            // testValue determines amount of times M is repeated
-            testValue = seperateInputNumbers[i] / 1000
-            console.log(testValue);
-            for (let i = 0; i<testValue; i++) {
-                romanNumeralValue += 'M';
-            }
+seperateInputNumbers.forEach(function(seperateInputNumber) {
+    // used testValue as a base for all conditions
+    testValue = seperateInputNumber/1000;
 
-        } else if (seperateInputNumbers[i] == 900) {
-            romanNumeralValue += 'CM'
+    // convert number to roman numeral value 
+    //push to object to array
 
-        } else if (499<seperateInputNumbers[i] && seperateInputNumbers[i]<900) {
-            // minus 500 to get preceding letters for numbers>500
-            baseNum = seperateInputNumbers[i] - 500;
-            testValue = baseNum / 100;
-            // if just 500
-            romanNumeralValue += 'D';
-            //if more than 500
-            for(let i = 0; i<testValue; i++) {
-                 romanNumeralValue += 'C';
-            }
-                
-        } else if (seperateInputNumbers[i] == 400) {
-            romanNumeralValue += 'CD'
+    if (testValue >= 1){
+        // manipulated string to repeat based on amount of thousands
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+        romanValue: 'M'.repeat(testValue)}) ;
 
-        } else if (99<seperateInputNumbers[i] && seperateInputNumbers[i]<400) {
-            //numbers between 100 and 300
-            baseNum = seperateInputNumbers[i];
-            testValue = baseNum / 100;
-            for(let i = 0; i<testValue; i++) {
-                 romanNumeralValue += 'C';
-            }
-                
-        } else if (seperateInputNumbers[i] == 90) {
-            romanNumeralValue += 'XC'
+    } else if(testValue == 0.9) { 
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'CM'}) ;
 
-        } else if (49<seperateInputNumbers[i] && seperateInputNumbers[i]<90) {
-            // minus 50 to get preceding letters for numbers>50
-            baseNum = seperateInputNumbers[i] - 50;
-            testValue = baseNum / 10;
-            // if just 50
-            romanNumeralValue += 'L';
-            //if more than 50
-            for(let i = 0; i<testValue; i++) {
-                 romanNumeralValue += 'X';
-            }
-                
-        } else if (seperateInputNumbers[i] == 40) {
-            romanNumeralValue += 'XL'
+    } else if(testValue > 0.4 && testValue < 0.9) {
+        // D = default string for 500 
+        //convert testValue to whole numbers to use repeat method for string
+        // testValue determines C's added to romanValue for 500>numbers<900 
+        testValue = (testValue * 10) -5;
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'D' + 'C'.repeat(testValue) }) ;
 
-        } else if (10<seperateInputNumbers[i] && seperateInputNumbers[i]<40) {
-            //numbers between 10 and 30
-            baseNum = seperateInputNumbers[i];
-            testValue = baseNum / 10;
-            for(let i = 0; i<testValue; i++) {
-                 romanNumeralValue += 'X';
-            }
-                
-        } else if (seperateInputNumbers[i] == 9) {
-            romanNumeralValue += 'IX'
+    } else if(testValue == 0.4){
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'CD'}) ;
+   
+    } else if(testValue >= 0.1 && testValue < 0.4) {
+        // length of C's depends on number of 100's for num<400
+        testValue = testValue * 10;
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'C'.repeat(testValue)}) ;
+         
+    } else if(testValue == 0.09){
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'XC' })
 
-        } else if (4<seperateInputNumbers[i] && seperateInputNumbers[i]<9) {
-            // minus 5 to get preceding letters for numbers>5
-            baseNum = seperateInputNumbers[i] - 5;
-            // if just 5
-            romanNumeralValue += 'V';
-            //if more than 5
-            for(let i = 0; i<baseNum; i++) {
-                 romanNumeralValue += 'I';
-            }
-                
-        } else if (seperateInputNumbers[i] == 4) {
-            romanNumeralValue += 'IV'
+    } else if(testValue >= 0.05 && testValue < 0.09) {
+        testValue = (testValue * 100) - 5;
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'L' + 'X'.repeat(testValue) });
 
-        }else if (0<seperateInputNumbers[i] && seperateInputNumbers[i]<4) {
-            // minus 5 to get preceding letters for numbers>5
-            baseNum = seperateInputNumbers[i]
-            for(let i = 0; i<baseNum; i++) {
-                 romanNumeralValue += 'I';
-            }
-                
-        } 
-    }    
+    } else if(testValue == 0.04) {
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'XL' });
 
-}
-romanNumerals();
+    } else if(testValue >= 0.01 && testValue < 0.04) {
+        testValue = (testValue * 100);
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'X'.repeat(testValue) });
+
+    } else if (testValue == 0.009){
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'IX'});
+
+    } else if (testValue >= 0.005 && testValue < 0.009) {
+        testValue = (testValue * 1000) - 5;
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'V'+'I'.repeat(testValue) });
+
+    } else if(testValue == 0.004){
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'IV'});
+
+    }else if(testValue >= 0.001 && testValue < 0.004) {
+        testValue = (testValue * 1000);
+        romanNumeralValue.push({ numberValue: seperateInputNumber,
+            romanValue: 'I'.repeat(testValue) });
+    }
+ 
+});
 
 console.log('The roman numeral equivalent of this value is: ');
-console.log(romanNumeralValue);
+const romanNumeralMap = romanNumeralValue.map(joinRomans => joinRomans.romanValue);
+console.log(romanNumeralMap.join(''));
+
