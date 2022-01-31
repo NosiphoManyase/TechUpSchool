@@ -28,7 +28,7 @@ chooseOption();
 
 function createAccount(name, balance, maxWithdrawalLimit, minWithdrawalLimit, maxDepositLimit, minDepositiLimit){
     
-    name = prompt('\nPlease enter your name: ');
+    name = prompt('Please enter your name: ');
     balance = Number(prompt('Please enter your initial deposit amount: R'));
     // withdrawal limit set to balance
     maxWithdrawalLimit = balance;
@@ -53,18 +53,19 @@ function createAccount(name, balance, maxWithdrawalLimit, minWithdrawalLimit, ma
     bankAccounts.push(bankAccount);
     //map id's for other functions to locate account being used
     mapID = bankAccounts.map(account => account.accountID);
+    mapAccountState = bankAccounts.map(account => account.accountState);
     console.log(mapID);
-    console.log(bankAccounts);
     chooseOption();
     
 }
 
 // function closes account and sets balance to zero
 function closeAccount(id){
-    id = prompt('\nEnter unique id: ');
+    id = prompt('Enter unique id: ');
     // check if id exists, if not, process starts over
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
+        // recall function
         closeAccount();
     }
     
@@ -74,60 +75,66 @@ function closeAccount(id){
             account.balance = 0;
             console.log('Account successfuly closed');
         }
-    }); 
-    console.log(bankAccounts);  
-
+    });
+    // back to main menu
     chooseOption();
 
 }
 
 function depositFunds(id){
-    id = prompt('\nEnter unique id : ');
+    id = prompt('Enter unique id : ');
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
         depositFunds();
-    }
-    const deposit = Number(prompt('Enter deposit amount: '));
 
-    bankAccounts.forEach(account => {
-        if (account.accountState = 'Closed'){
-            // prevent transaction if account is closed
+    } else {
+        const deposit = Number(prompt('Enter deposit amount: '));
+        const objIndex = bankAccounts.findIndex(obj => obj.accountID == id);
+        if (bankAccounts[objIndex].accountState == 'Closed') {
+            //prevent transaction if account is closed
             console.log('Account has been closed, transaction can\'t be processed');
             chooseOption();
-        } else if(account.accountID == id && deposit <= account.maxDepositLimit){
-            account.balance = account.balance + deposit;
-        } else if (account.accountID == id && deposit > account.maxDepositLimit){
+        } else if(deposit <= bankAccounts[objIndex].maxDepositLimit && deposit >= bankAccounts[objIndex].minDepositiLimit){
+            console.log(`Old Balance: ${bankAccounts[objIndex].balance}`);
+            bankAccounts[objIndex].balance = bankAccounts[objIndex].balance + deposit;
+            console.log(`New Balance: ${bankAccounts[objIndex].balance}`);
+            // update maxWithdrawalLimit to equal to balance
+            bankAccounts[objIndex].maxWithdrawalLimit = bankAccounts[objIndex].balance;
+
+        } else if (deposit > bankAccounts[objIndex].maxDepositLimit){
             console.log('Deposit amount exceeds deposit limit! Try again');
             depositFunds();
+
         }
-    })
-    console.log(bankAccounts);
+    }
     chooseOption();
 
 }
 function withdrawFunds(id){
-    id = prompt('\nEnter unique id: ');
+    id = prompt('Enter unique id: ');
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
         withdrawFunds();
-    }
-    const withdrawal = Number(prompt('Enter withdrawal amount: '));
-
-    bankAccounts.forEach(account => {
-        if (account.accountState = 'Closed'){
+    } else {    
+        const withdrawal = Number(prompt('Enter withdrawal amount: '));
+        const objIndex = bankAccounts.findIndex(obj => obj.accountID == id);
+        if (bankAccounts[objIndex].accountState == 'Closed') {
+            //prevent transaction if account is closed
             console.log('Account has been closed, transaction can\'t be processed');
             chooseOption();
-        } else if(account.accountID == id && withdrawal <= account.maxWithdrawalLimit){
-            console.log(`Current balance: R${account.balance}`);
-            account.balance = account.balance - withdrawal;
-            account.maxWithdrawalLimit = account.balance;
-            console.log(`New balance: R${account.balance}`);
-        } else if(account.accountID == id && withdrawal > account.maxWithdrawalLimit){
-            console.log('Insufficient funds! Try again');
+        } else if(withdrawal <= bankAccounts[objIndex].maxWithdrawalLimit && withdrawal >= bankAccounts[objIndex].minWithdrawalLimit){
+            console.log(`Old Balance: ${bankAccounts[objIndex].balance}`);
+            bankAccounts[objIndex].balance = bankAccounts[objIndex].balance - withdrawal;
+            console.log(`New Balance: ${bankAccounts[objIndex].balance}`);
+            // update withdrawal limit to current balance of account
+            bankAccounts[objIndex].maxWithdrawalLimit = bankAccounts[objIndex].balance
+
+        } else if (withdrawal > bankAccounts[objIndex].maxWithdrawalLimit){
+            console.log('Insufficient Funds! Try again');
             withdrawFunds();
+
         }
-    })
-    console.log(bankAccounts);
+    }
     chooseOption();
 }
 
