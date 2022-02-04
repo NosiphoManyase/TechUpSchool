@@ -6,41 +6,54 @@ body {
  background-size: cover;
 }
 
-.first-section{
- margin-top: 0%;
- background-image:url("shore_view.jpg");
- background-repeat: no-repeat;
- background-size: cover;  
-}
-.second-section{
-    margin-left: 15px;
+.info-section{
+    margin: 30px;
 }
 
 img {
- max-width: 200px;
- border-radius: 50%;
+ max-width: 1350px;
 
 }
 .my-name{
   font-family:'Copperplate Gothic Light', 'Arial Narrow', Arial, sans-serif;
-  color: rgb(51, 75, 143);
-  font-size: 50px;
+  color: black;
+  font-size: 60px;
   font-weight: bold;
   text-align: center;
 }
 
 .my-title{
-    font-family: fantasy;
-    font-size: large;
+  margin-top: 60px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: large;
+  font-weight: bold;
 }
 
 .intro {
+ margin-top: 60px;
  margin: 10px;
- font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
- font-variant: small-caps;
+ font-family: Georgia, 'Times New Roman', Times, serif;
+ font-size: medium;
+ line-height: 26px;
 }
 
-h3 span{
- background-color: rgb(148, 213, 224);
+h3{
+  margin-top: 60px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: large;
+}
+
+.profile{
+  background-image:url("grey.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.profile-info{
+  margin-left: 50px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: large;
 }
 
