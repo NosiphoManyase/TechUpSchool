@@ -1,13 +1,19 @@
-const create = require('prompt-sync');
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const port = 3000;
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true,}));
 
 let bankAccount = {};
 let bankAccounts = [];
 let mapID = [];
 
-prompt = require('prompt-sync')();
+const prompt = require('prompt-sync')();
 // main menu directs user to relevant action
 function chooseOption() {
-    const options = prompt('What action would you like to take?(enter 1,2,3 or 4) 1. Create an account 2.Close an account 3.Deposit to account 4.Withdraw from account: ');
+    const options = prompt('What action would you like to take?(enter 1,2,3 or 4) 1. Create an account 2.Close an account 3.Deposit to account 4.Withdraw from account 5.Exit: ');
     if(options == '1'){
         createAccount();
     } else if (options == '2'){
@@ -16,6 +22,9 @@ function chooseOption() {
         depositFunds();
     } else if (options == '4') {
         withdrawFunds();
+    } else if (options == '5') {
+        console.log('You have exited');
+        return;
     } else if (options == ''){
         console.log('You have not chosen an option! Try again \n');
         chooseOption();
@@ -26,7 +35,7 @@ function chooseOption() {
 } 
 chooseOption();
 
-function createAccount(name, balance, maxWithdrawalLimit, minWithdrawalLimit, maxDepositLimit, minDepositiLimit){
+function createAccount(name, id, balance, maxWithdrawalLimit, minWithdrawalLimit, maxDepositLimit, minDepositiLimit){
     
     name = prompt('Please enter your name: ');
     balance = Number(prompt('Please enter your initial deposit amount: R'));
@@ -35,8 +44,8 @@ function createAccount(name, balance, maxWithdrawalLimit, minWithdrawalLimit, ma
     minWithdrawalLimit = 20;
     maxDepositLimit = 10000;
     minDepositiLimit = 50;
-    // id takes first letter of name, the rest is computed randomly
-    const id = name.charAt(0) + Math.random().toString(36).substring(2,8);
+    // id starts at 1
+    id = bankAccounts.length + 1
     
     // create object
     bankAccount = {name: name,
@@ -49,6 +58,11 @@ function createAccount(name, balance, maxWithdrawalLimit, minWithdrawalLimit, ma
         minWithdrawalLimit: minWithdrawalLimit
 
     }
+    //*************** 
+    app.post('/clients', (req,res) =>{
+
+    res.status(200).json(bankAccount);
+    })
     // push object to array
     bankAccounts.push(bankAccount);
     //map id's for other functions to locate account being used
@@ -56,12 +70,13 @@ function createAccount(name, balance, maxWithdrawalLimit, minWithdrawalLimit, ma
     mapAccountState = bankAccounts.map(account => account.accountState);
     console.log(mapID);
     chooseOption();
+    //return bankAccounts;
     
 }
 
 // function closes account and sets balance to zero
 function closeAccount(id){
-    id = prompt('Enter unique id: ');
+    id = Number(prompt('Enter unique id: '));
     // check if id exists, if not, process starts over
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
@@ -76,13 +91,18 @@ function closeAccount(id){
             console.log('Account successfuly closed');
         }
     });
+    //****************************
+    app.delete('/clients/:id', (req,res) =>{
+        const id = parseInt(req.params.id);
+        res.send('Account deleted');
+    })
     // back to main menu
     chooseOption();
 
 }
 
 function depositFunds(id){
-    id = prompt('Enter unique id : ');
+    id = Number(prompt('Enter unique id : '));
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
         depositFunds();
@@ -97,6 +117,7 @@ function depositFunds(id){
         } else if(deposit <= bankAccounts[objIndex].maxDepositLimit && deposit >= bankAccounts[objIndex].minDepositiLimit){
             console.log(`Old Balance: ${bankAccounts[objIndex].balance}`);
             bankAccounts[objIndex].balance = bankAccounts[objIndex].balance + deposit;
+            const balanced = bankAccounts[objIndex].balance;
             console.log(`New Balance: ${bankAccounts[objIndex].balance}`);
             // update maxWithdrawalLimit to equal to balance
             bankAccounts[objIndex].maxWithdrawalLimit = bankAccounts[objIndex].balance;
@@ -106,12 +127,18 @@ function depositFunds(id){
             depositFunds();
 
         }
+    
+        app.put('/clients/transaction/:id', (req,res) => {
+            const id = parseInt(req.params.id);
+            res.json(bankAccounts).end();
+        
+        })
     }
     chooseOption();
 
 }
 function withdrawFunds(id){
-    id = prompt('Enter unique id: ');
+    id = Number(prompt('Enter unique id: '));
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
         withdrawFunds();
@@ -125,6 +152,7 @@ function withdrawFunds(id){
         } else if(withdrawal <= bankAccounts[objIndex].maxWithdrawalLimit && withdrawal >= bankAccounts[objIndex].minWithdrawalLimit){
             console.log(`Old Balance: ${bankAccounts[objIndex].balance}`);
             bankAccounts[objIndex].balance = bankAccounts[objIndex].balance - withdrawal;
+            const balanced = bankAccounts[objIndex].balance ;
             console.log(`New Balance: ${bankAccounts[objIndex].balance}`);
             // update withdrawal limit to current balance of account
             bankAccounts[objIndex].maxWithdrawalLimit = bankAccounts[objIndex].balance
@@ -134,7 +162,20 @@ function withdrawFunds(id){
             withdrawFunds();
 
         }
+        app.put('/clients/transaction/:id', (req,res) => {
+            const id = parseInt(req.params.id);
+            res.json(bankAccounts).end();
+        
+        })
     }
     chooseOption();
 }
 
+//********************** */
+app.get('/clients', (req,res) =>{
+    res.send(bankAccounts);
+} );
+
+app.listen(port, ()=>{
+    console.log(`App listening on port ${port}`);
+})
