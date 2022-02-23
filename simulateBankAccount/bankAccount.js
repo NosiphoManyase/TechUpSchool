@@ -38,20 +38,18 @@ chooseOption();
 
 function createAccount(body){
     
-    body.name = prompt('Please enter your name: ');
-    body.balance = Number(prompt('Please enter your initial deposit amount: R'));
     // withdrawal limit set to balance
     maxWithdrawalLimit = balance;
     minWithdrawalLimit = 20;
     maxDepositLimit = 10000;
     minDepositiLimit = 50;
     // id starts at 1
-    body.id = bankAccounts.length + 1
+    body.id = 
     
     // create object
-    bankAccount = {name: name,
-        balance: balance,
-        accountID: id,
+    bankAccount = {name: body.name,
+        balance: body.balance,
+        accountID: bankAccounts.length + 1,
         accountState: 'Open',
         maxDepositLimit: maxDepositLimit,
         maxWithdrawalLimit: maxWithdrawalLimit,
@@ -66,8 +64,6 @@ function createAccount(body){
     mapID = bankAccounts.map(account => account.accountID);
     mapAccountState = bankAccounts.map(account => account.accountState);
     console.log(mapID);
-    chooseOption();
-    //return bankAccounts;
     
 }
 
@@ -87,7 +83,7 @@ function closeAccount(id){
             account.accountState = 'Closed';
             account.balance = 0;
             console.log('Account successfuly closed');
-            account = result;
+            result = account;
         }
     });
     // back to main menu
@@ -96,15 +92,13 @@ function closeAccount(id){
 
 }
 
-function depositFunds(id){
+function depositFunds(id, deposit){
     let result = {};
-    id = Number(prompt('Enter unique id : '));
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
         depositFunds();
 
     } else {
-        const deposit = Number(prompt('Enter deposit amount: '));
         const objIndex = bankAccounts.findIndex(obj => obj.accountID == id);
         if (bankAccounts[objIndex].accountState == 'Closed') {
             //prevent transaction if account is closed
@@ -114,7 +108,7 @@ function depositFunds(id){
             console.log(`Old Balance: ${bankAccounts[objIndex].balance}`);
             bankAccounts[objIndex].balance = bankAccounts[objIndex].balance + deposit;
             const balanced = bankAccounts[objIndex].balance;
-            bankAccounts[objIndex] = result; //
+            result = bankAccounts[objIndex]; //
             console.log(`New Balance: ${bankAccounts[objIndex].balance}`);
             // update maxWithdrawalLimit to equal to balance
             bankAccounts[objIndex].maxWithdrawalLimit = bankAccounts[objIndex].balance;
@@ -123,21 +117,18 @@ function depositFunds(id){
             console.log('Deposit amount exceeds deposit limit! Try again');
             depositFunds();
 
-        }
-    
-        
+        }      
     }
     chooseOption();
     return result;
 
 }
-function withdrawFunds(id){
-    id = Number(prompt('Enter unique id: '));
+function withdrawFunds(id, withdrawal){
+    let result = []
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
         withdrawFunds();
     } else {    
-        const withdrawal = Number(prompt('Enter withdrawal amount: '));
         const objIndex = bankAccounts.findIndex(obj => obj.accountID == id);
         if (bankAccounts[objIndex].accountState == 'Closed') {
             //prevent transaction if account is closed
@@ -147,6 +138,7 @@ function withdrawFunds(id){
             console.log(`Old Balance: ${bankAccounts[objIndex].balance}`);
             bankAccounts[objIndex].balance = bankAccounts[objIndex].balance - withdrawal;
             const balanced = bankAccounts[objIndex].balance ;
+            result = bankAccounts[objIndex];
             console.log(`New Balance: ${bankAccounts[objIndex].balance}`);
             // update withdrawal limit to current balance of account
             bankAccounts[objIndex].maxWithdrawalLimit = bankAccounts[objIndex].balance
@@ -158,8 +150,8 @@ function withdrawFunds(id){
         }
     }
     chooseOption();
+    return result;
 }
-console.log('Hey');
 //********************** */
 //createAccount() closeAccount();   depositFunds(); withdrawFunds();
 app.get('/clients', (req,res) =>{
@@ -180,18 +172,19 @@ app.put('/clients/:id', (req,res) =>{
     res.json(account).send('Account has been closed');
 })
 
-app.put('/clients/transaction/:id', (req,res) => {
+//
+app.put('/clients/transaction/deposit/:id', (req,res) => {
     const id = parseInt(req.params.id);
     const body = req.body; 
-    const account = depositFunds(id);
+    const account = depositFunds(id,body.deposit);
     res.json(account);
 
 })
 
-app.put('/clients/transaction/:id', (req,res) => {
+app.put('/clients/transaction/withrawal/:id', (req,res) => {
     const id = parseInt(req.params.id);
     const body = req.body;
-    const account = withdrawFunds(id);
+    const account = withdrawFunds(id, body.withdrawal);
     res.json(account);
 
 })
