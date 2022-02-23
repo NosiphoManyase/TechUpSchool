@@ -36,17 +36,17 @@ function chooseOption() {
 chooseOption();
 
 
-function createAccount(name, id, balance, maxWithdrawalLimit, minWithdrawalLimit, maxDepositLimit, minDepositiLimit){
+function createAccount(body){
     
-    name = prompt('Please enter your name: ');
-    balance = Number(prompt('Please enter your initial deposit amount: R'));
+    body.name = prompt('Please enter your name: ');
+    body.balance = Number(prompt('Please enter your initial deposit amount: R'));
     // withdrawal limit set to balance
     maxWithdrawalLimit = balance;
     minWithdrawalLimit = 20;
     maxDepositLimit = 10000;
     minDepositiLimit = 50;
     // id starts at 1
-    id = bankAccounts.length + 1
+    body.id = bankAccounts.length + 1
     
     // create object
     bankAccount = {name: name,
@@ -73,7 +73,8 @@ function createAccount(name, id, balance, maxWithdrawalLimit, minWithdrawalLimit
 
 // function closes account and sets balance to zero
 function closeAccount(id){
-    id = Number(prompt('Enter unique id: '));
+    let result = {};
+    //id = Number(prompt('Enter unique id: '));
     // check if id exists, if not, process starts over
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
@@ -86,15 +87,17 @@ function closeAccount(id){
             account.accountState = 'Closed';
             account.balance = 0;
             console.log('Account successfuly closed');
+            account = result;
         }
     });
-    
     // back to main menu
     chooseOption();
+    return result;
 
 }
 
 function depositFunds(id){
+    let result = {};
     id = Number(prompt('Enter unique id : '));
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
@@ -111,6 +114,7 @@ function depositFunds(id){
             console.log(`Old Balance: ${bankAccounts[objIndex].balance}`);
             bankAccounts[objIndex].balance = bankAccounts[objIndex].balance + deposit;
             const balanced = bankAccounts[objIndex].balance;
+            bankAccounts[objIndex] = result; //
             console.log(`New Balance: ${bankAccounts[objIndex].balance}`);
             // update maxWithdrawalLimit to equal to balance
             bankAccounts[objIndex].maxWithdrawalLimit = bankAccounts[objIndex].balance;
@@ -124,6 +128,7 @@ function depositFunds(id){
         
     }
     chooseOption();
+    return result;
 
 }
 function withdrawFunds(id){
@@ -163,42 +168,31 @@ app.get('/clients', (req,res) =>{
 
 app.post('/clients', (req,res) =>{
     const body = req.body;
-    bankAccounts.push(body);
+    const newAccount = createAccount(body);
 
     res.json(bankAccounts);
 })
 
-app.delete('/clients/:id', (req,res) =>{
+app.put('/clients/:id', (req,res) =>{
     const id = parseInt(req.params.id);
-    const body = req.body;
-    const account = bankAccounts.find((accountD) => accountD.accountID === id);
+    const account = closeAccount(id);
 
-    const newAccounts = bankAccounts.filter((account) => account.id != id);
-    bankAccounts = newAccounts;
-    res.json(newAccounts).json(index);
-
-    res.send('Account deleted');
+    res.json(account).send('Account has been closed');
 })
 
 app.put('/clients/transaction/:id', (req,res) => {
     const id = parseInt(req.params.id);
     const body = req.body; 
-    const account = bankAccounts.find((account) => account.accountID === id);
-    const index = bankAccounts.indexOf(account);
-    // get deposit amount from req body?
-    //automating balance, and max withdrawal = balance?
-    res.json(bankAccounts).end();
+    const account = depositFunds(id);
+    res.json(account);
 
 })
 
 app.put('/clients/transaction/:id', (req,res) => {
     const id = parseInt(req.params.id);
     const body = req.body;
-    const account = bankAccounts.find((account) => account.accountID === id);
-    const index = bankAccounts.indexOf(account);
-    // get withdrawal amount from req body?
-    //automating balance, and max withdrawal = balance
-    res.json(bankAccounts).end();
+    const account = withdrawFunds(id);
+    res.json(account);
 
 })
 
