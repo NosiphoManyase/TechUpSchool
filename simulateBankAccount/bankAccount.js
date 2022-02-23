@@ -39,12 +39,10 @@ chooseOption();
 function createAccount(body){
     
     // withdrawal limit set to balance
-    maxWithdrawalLimit = balance;
+    maxWithdrawalLimit = body.balance;
     minWithdrawalLimit = 20;
     maxDepositLimit = 10000;
     minDepositiLimit = 50;
-    // id starts at 1
-    body.id = 
     
     // create object
     bankAccount = {name: body.name,
@@ -86,8 +84,6 @@ function closeAccount(id){
             result = account;
         }
     });
-    // back to main menu
-    chooseOption();
     return result;
 
 }
@@ -96,14 +92,14 @@ function depositFunds(id, deposit){
     let result = {};
     if (mapID.includes(id) == false){
         console.log('id not found, make sure your id is correct!');
-        depositFunds();
+        result = 'ID incorrect';
 
     } else {
         const objIndex = bankAccounts.findIndex(obj => obj.accountID == id);
         if (bankAccounts[objIndex].accountState == 'Closed') {
             //prevent transaction if account is closed
             console.log('Account has been closed, transaction can\'t be processed');
-            chooseOption();
+            result = 'Account closed';
         } else if(deposit <= bankAccounts[objIndex].maxDepositLimit && deposit >= bankAccounts[objIndex].minDepositiLimit){
             console.log(`Old Balance: ${bankAccounts[objIndex].balance}`);
             bankAccounts[objIndex].balance = bankAccounts[objIndex].balance + deposit;
@@ -115,11 +111,11 @@ function depositFunds(id, deposit){
 
         } else if (deposit > bankAccounts[objIndex].maxDepositLimit){
             console.log('Deposit amount exceeds deposit limit! Try again');
-            depositFunds();
-
-        }      
+            result = 'Deposit amount exceeded';
+        } else {
+            result = 'something went wrong';
+        }     
     }
-    chooseOption();
     return result;
 
 }
@@ -149,7 +145,6 @@ function withdrawFunds(id, withdrawal){
 
         }
     }
-    chooseOption();
     return result;
 }
 //********************** */
