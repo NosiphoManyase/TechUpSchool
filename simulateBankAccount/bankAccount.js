@@ -4,7 +4,7 @@ const app = express();
 const port = 3000;
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true,}));
+app.use(bodyParser.urlencoded({ extended: false,}));
 
 let bankAccount = {};
 let bankAccounts = [];
@@ -35,6 +35,7 @@ function chooseOption() {
 } 
 chooseOption();
 
+
 function createAccount(name, id, balance, maxWithdrawalLimit, minWithdrawalLimit, maxDepositLimit, minDepositiLimit){
     
     name = prompt('Please enter your name: ');
@@ -58,11 +59,7 @@ function createAccount(name, id, balance, maxWithdrawalLimit, minWithdrawalLimit
         minWithdrawalLimit: minWithdrawalLimit
 
     }
-    //*************** 
-    app.post('/clients', (req,res) =>{
-
-    res.status(200).json(bankAccount);
-    })
+    
     // push object to array
     bankAccounts.push(bankAccount);
     //map id's for other functions to locate account being used
@@ -91,11 +88,7 @@ function closeAccount(id){
             console.log('Account successfuly closed');
         }
     });
-    //****************************
-    app.delete('/clients/:id', (req,res) =>{
-        const id = parseInt(req.params.id);
-        res.send('Account deleted');
-    })
+    
     // back to main menu
     chooseOption();
 
@@ -128,11 +121,7 @@ function depositFunds(id){
 
         }
     
-        app.put('/clients/transaction/:id', (req,res) => {
-            const id = parseInt(req.params.id);
-            res.json(bankAccounts).end();
         
-        })
     }
     chooseOption();
 
@@ -162,19 +151,56 @@ function withdrawFunds(id){
             withdrawFunds();
 
         }
-        app.put('/clients/transaction/:id', (req,res) => {
-            const id = parseInt(req.params.id);
-            res.json(bankAccounts).end();
-        
-        })
     }
     chooseOption();
 }
-
+console.log('Hey');
 //********************** */
+//createAccount() closeAccount();   depositFunds(); withdrawFunds();
 app.get('/clients', (req,res) =>{
-    res.send(bankAccounts);
-} );
+    res.json(bankAccounts);
+});
+
+app.post('/clients', (req,res) =>{
+    const body = req.body;
+    bankAccounts.push(body);
+
+    res.json(bankAccounts);
+})
+
+app.delete('/clients/:id', (req,res) =>{
+    const id = parseInt(req.params.id);
+    const body = req.body;
+    const account = bankAccounts.find((accountD) => accountD.accountID === id);
+
+    const newAccounts = bankAccounts.filter((account) => account.id != id);
+    bankAccounts = newAccounts;
+    res.json(newAccounts).json(index);
+
+    res.send('Account deleted');
+})
+
+app.put('/clients/transaction/:id', (req,res) => {
+    const id = parseInt(req.params.id);
+    const body = req.body; 
+    const account = bankAccounts.find((account) => account.accountID === id);
+    const index = bankAccounts.indexOf(account);
+    // get deposit amount from req body?
+    //automating balance, and max withdrawal = balance?
+    res.json(bankAccounts).end();
+
+})
+
+app.put('/clients/transaction/:id', (req,res) => {
+    const id = parseInt(req.params.id);
+    const body = req.body;
+    const account = bankAccounts.find((account) => account.accountID === id);
+    const index = bankAccounts.indexOf(account);
+    // get withdrawal amount from req body?
+    //automating balance, and max withdrawal = balance
+    res.json(bankAccounts).end();
+
+})
 
 app.listen(port, ()=>{
     console.log(`App listening on port ${port}`);
